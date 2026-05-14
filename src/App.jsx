@@ -7,6 +7,8 @@ import hygieneImg from './assets/personal-hygiene.png'
 function App() {
   const [activeTab, setActiveTab] = useState('All')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalData, setModalData] = useState(null)
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -27,7 +29,23 @@ function App() {
     { id: 3, name: 'Antibacterial Hand Wash', category: 'Personal Hygiene', image: hygieneImg, desc: 'Gentle on skin, tough on germs.' },
     { id: 4, name: 'Industrial Floor Cleaner', category: 'Disinfectants', image: disinfectantImg, desc: 'Heavy-duty grime removal.' },
     { id: 5, name: 'Wheel & Rim Shine', category: 'Car Care', image: carCareImg, desc: 'Deep cleaning for alloy wheels.' },
-    { id: 6, name: 'Luxury Liquid Soap', category: 'Personal Hygiene', image: hygieneImg, desc: 'Floral scented moisturizing soap.' }
+    { id: 6, name: 'Luxury Liquid Soap', category: 'Personal Hygiene', image: hygieneImg, desc: 'Floral scented moisturizing soap.' },
+    {
+      id: 7,
+      name: 'Air Fresheners Assortment',
+      category: 'Air Fresheners',
+      image: '/air_freshner/all-freshners.webp',
+      desc: 'Explore our complete collection of refreshing scents.',
+      isCollection: true,
+      collectionItems: [
+        { id: 101, name: 'Cinnamon', image: '/air_freshner/cinnamon.webp', desc: 'Warm and spicy cinnamon scent.' },
+        { id: 102, name: 'Jasmine', image: '/air_freshner/jasmine.webp', desc: 'Sweet and floral jasmine fragrance.' },
+        { id: 103, name: 'Lavender', image: '/air_freshner/lavender.webp', desc: 'Calming and relaxing lavender aroma.' },
+        { id: 104, name: 'Ocean Breeze', image: '/air_freshner/ocean.webp', desc: 'Crisp and refreshing ocean breeze.' },
+        { id: 105, name: 'Pomegranate', image: '/air_freshner/pomegranate.webp', desc: 'Fruity and sweet pomegranate scent.' },
+        { id: 106, name: 'Strawberry', image: '/air_freshner/strawberry.webp', desc: 'Sweet and juicy strawberry fragrance.' }
+      ]
+    }
   ]
 
   const filteredProducts = activeTab === 'All' ? products : products.filter(p => p.category === activeTab)
@@ -162,7 +180,7 @@ function App() {
           </div>
 
           <div className="products-filters flex justify-center gap-4 mb-12 flex-wrap reveal delay-100">
-            {['All', 'Disinfectants', 'Car Care', 'Personal Hygiene'].map(tab => (
+            {['All', 'Disinfectants', 'Car Care', 'Personal Hygiene', 'Air Fresheners'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -187,7 +205,17 @@ function App() {
                   <span className="product-category text-primary">{product.category}</span>
                   <h3 className="product-title">{product.name}</h3>
                   <p className="product-desc text-muted">{product.desc}</p>
-                  <button className="product-link text-primary">Learn More &rarr;</button>
+                  <button 
+                    className="product-link text-primary"
+                    onClick={() => {
+                      if (product.isCollection) {
+                        setModalData(product)
+                        setIsModalOpen(true)
+                      }
+                    }}
+                  >
+                    {product.isCollection ? 'View Collection \u2192' : 'Learn More \u2192'}
+                  </button>
                 </div>
               </div>
             ))}
@@ -271,6 +299,37 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Modal */}
+      <div className={`modal-overlay ${isModalOpen ? 'open' : ''}`} onClick={() => setIsModalOpen(false)}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <button className="modal-close" onClick={() => setIsModalOpen(false)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          
+          {modalData && (
+            <>
+              <div className="modal-header">
+                <h2 className="modal-title">{modalData.name}</h2>
+                <p className="text-muted">{modalData.desc}</p>
+              </div>
+              <div className="modal-grid">
+                {modalData.collectionItems.map(item => (
+                  <div key={item.id} className="modal-card">
+                    <div className="modal-card-img-wrapper">
+                      <img src={item.image} alt={item.name} className="modal-card-img" />
+                    </div>
+                    <div className="modal-card-info">
+                      <h4 className="modal-card-title text-white">{item.name}</h4>
+                      <p className="text-muted text-sm m-0">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
